@@ -1,0 +1,4 @@
+build --platforms=@pico-sdk//bazel/platform:rp2040
+build --@pico-sdk//bazel/config:PICO_BOARD=pico_w
+build --@rules_cc//cc/toolchains:experimental_enable_rule_based_toolchains
+build --@pico-sdk//bazel/config:PICO_STDIO_USB=True
