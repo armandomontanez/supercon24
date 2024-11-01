@@ -1,11 +1,14 @@
 #pragma once
 
+#include <cstring>
+
 #include "log.h"
 #include "hardware/i2c.h"
 
 class PetalMatrix {
  public:
   PetalMatrix() : i2c_instance_(i2c0) {
+    memset(state_, 0, sizeof(state_));
   }
 
   void Init() {
@@ -42,7 +45,29 @@ class PetalMatrix {
     i2c_write_blocking(i2c_instance_, kI2cAddr, global_intensity_cmd, sizeof(global_intensity_cmd), false);
   }
 
-  void EnableLed(size_t arm, size_t index) {
+  void LedState(size_t arm, size_t index, bool enabled) {
+    if (arm > 7) {
+      LOG(ERROR, "Arm %d doesn't exist", int(arm));
+      return;
+    }
+    if (index > 7) {
+      LOG(ERROR, "Index %d doesn't exist", int(index));
+      return;
+    }
+    if (enabled) {
+      state_[arm] |= DigitRegister::SegmentCmd(index);
+    } else {
+      state_[arm] &= (~DigitRegister::SegmentCmd(index));
+    }
+
+    uint8_t cmd[] = {
+      DigitRegister::Address(arm),
+      state_[arm],
+    };
+    i2c_write_blocking(i2c_instance_, kI2cAddr, cmd, sizeof(cmd), false);
+  }
+
+  void EnableSingleLed(size_t arm, size_t index) {
     if (arm > 7) {
       LOG(ERROR, "Arm %d doesn't exist", int(arm));
     }
@@ -91,4 +116,5 @@ class PetalMatrix {
   static constexpr uint8_t kI2cAddr = 0x00;
   i2c_inst_t* i2c_instance_;
   size_t foo_;
+  uint8_t state_[8];
 };
