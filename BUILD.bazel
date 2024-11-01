@@ -7,12 +7,26 @@ cc_library(
     includes = ["public"],
 )
 
+cc_library(
+    name = "petal_matrix",
+    hdrs = [
+        "public/petal_matrix.h",
+    ],
+    deps = [
+        ":log",
+    ],
+    includes = ["public"],
+)
+
+
 cc_binary(
     name = "main",
     includes = ["public"],
     srcs = ["main.cc"],
     deps = [
+        ":petal_matrix",
         ":log",
+        "@pico-sdk//src/rp2_common/hardware_i2c",
         "@pico-sdk//src/rp2_common/pico_stdlib",
     ],
 )
