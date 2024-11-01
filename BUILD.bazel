@@ -1,7 +1,18 @@
+
+cc_library(
+    name = "log",   
+    hdrs = [
+        "public/log.h",
+    ],
+    includes = ["public"],
+)
+
 cc_binary(
     name = "main",
+    includes = ["public"],
     srcs = ["main.cc"],
     deps = [
+        ":log",
         "@pico-sdk//src/rp2_common/pico_stdlib",
     ],
 )
