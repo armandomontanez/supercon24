@@ -8,4 +8,4 @@
 #define ERROR "err"
 
 #define LOG(level, msg, ...) \
-  printf("[" level "]: " msg "\n", ##__VA_ARGS__)
+  printf("[" level "]  " msg "\n", ##__VA_ARGS__)

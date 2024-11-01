@@ -1,6 +1,6 @@
 
 cc_library(
-    name = "log",   
+    name = "log", 
     hdrs = [
         "public/log.h",
     ],
