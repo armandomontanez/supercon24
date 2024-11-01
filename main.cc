@@ -6,17 +6,16 @@ int main() {
     stdio_init_all();
     PetalMatrix pm;
     pm.Init();
+    bool set_or_clear = true;
     while (true) {
         for (size_t i = 0; i < 8; i++) {
-            for (size_t j = 0; j < 10; j++) {
+            for (size_t j = 0; j < 7; j++) {
                 if (j < 7) {
-                    pm.LedState(i, j, true);
+                    pm.LedState(i, j, set_or_clear);
                 }
-                if (j >= 3) {
-                    pm.LedState(i, j - 3, false);
-                }
-                sleep_ms(100);
+                sleep_ms(10);
             }
         }
+        set_or_clear = !set_or_clear;
     }
 }
