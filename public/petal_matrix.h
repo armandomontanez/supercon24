@@ -67,20 +67,6 @@ class PetalMatrix {
     i2c_write_blocking(i2c_instance_, kI2cAddr, cmd, sizeof(cmd), false);
   }
 
-  void EnableSingleLed(size_t arm, size_t index) {
-    if (arm > 7) {
-      LOG(ERROR, "Arm %d doesn't exist", int(arm));
-    }
-    if (index > 7) {
-      LOG(ERROR, "Index %d doesn't exist", int(index));
-    }
-
-    uint8_t cmd[] = {
-      DigitRegister::Address(arm),
-      DigitRegister::SegmentCmd(index)
-    };
-    i2c_write_blocking(i2c_instance_, kI2cAddr, cmd, sizeof(cmd), false);
-  }
  private:
   class DigitRegister {
    public:
