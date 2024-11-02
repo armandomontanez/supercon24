@@ -33,7 +33,7 @@ class PetalMatrix {
     gpio_pull_up(kSclPin);
 
     // Restart command.
-    i2c_bus_.Write(kI2cAddr, {ShutdownRegister::Address(), ShutdownRegister::NormalOperationCmd()});
+    i2c_bus_.Write(kI2cAddr, {ShutdownRegister::Address(), ShutdownRegister::NormalOperationCmd(/*reset_to_default=*/true)});
 
     // No decode.
     i2c_bus_.Write(kI2cAddr, {DecodeEnableRegister::Address(), DecodeEnableRegister::NoDecodeCmd()});
@@ -43,6 +43,11 @@ class PetalMatrix {
 
     // Intensity.
     i2c_bus_.Write(kI2cAddr, {0x0A, 0x07});
+
+    // Start with all LEDs off.
+    for (size_t i = 0; i < 8; i++) {
+      i2c_bus_.Write(kI2cAddr, {DigitRegister::Address(i), 0});
+    }
   }
 
   void LedState(size_t arm, size_t index, bool enabled) {
