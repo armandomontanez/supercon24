@@ -1,21 +1,51 @@
+#include <cmath>
+
 #include "pico/stdlib.h"
 #include "log.h"
 #include "petal_matrix.h"
 
-int main() {
-    stdio_init_all();
-    PetalMatrix pm;
-    pm.Init();
-    bool set_or_clear = true;
-    while (true) {
-        for (size_t i = 0; i < 8; i++) {
-            for (size_t j = 0; j < 7; j++) {
-                if (j < 7) {
-                    pm.LedState(i, j, set_or_clear);
-                }
-                sleep_ms(10);
-            }
-        }
-        set_or_clear = !set_or_clear;
+class Animation {
+ public:
+  virtual void Update(int count) = 0;
+};
+
+class PetalAnimation : Animation {
+ public:
+  void Init() {
+    pm_.Init();
+  }
+
+  void Update(int count) override {
+    int step = count < 0 ? -1 : 1;
+    for (size_t i = 0; i < abs(count); i++) {
+      pm_.LedState(next_i_, next_j_, set_or_clear_);
+      next_j_ += step;
+      if (next_j_ < 0 || next_j_ >= kMaxj) {
+        next_i_ += step;
+        next_j_ = next_j_ < 0 ? kMaxj - 1 : 0;
+      }
+      if (next_i_ < 0 || next_i_ >= kMaxi) {
+        next_i_ = next_i_ < 0 ? kMaxi - 1 : 0;
+        set_or_clear_ = !set_or_clear_;
+      }
     }
+  }
+
+private:
+  static constexpr size_t kMaxi = 8;
+  static constexpr size_t kMaxj = 7;
+  PetalMatrix pm_;
+  bool set_or_clear_ = true;
+  int next_i_ = 0;
+  int next_j_ = 0;
+};
+
+int main() {
+  stdio_init_all();
+  PetalAnimation pa;
+  pa.Init();
+  while (true) {
+    pa.Update(1);
+    sleep_ms(10);
+  }
 }
