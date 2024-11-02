@@ -2,27 +2,38 @@
 
 #include "pico/stdlib.h"
 #include "log.h"
+#include "i2c.h"
 #include "petal_matrix.h"
+#include "hardware/i2c.h"
 
 class Animation {
  public:
+  Animation(uint32_t frame_timing_us) : frame_timing_us_(frame_timing_us) {}
+
+  void PlayForwards(bool play_forwards) {
+    playback_forwards_ = play_forwards;
+  }
+
   void Advance() {
     uint64_t time = time_us_64();
 
     int steps = (time - last_update_us_)/frame_timing_us_;
     if (steps) {
+      steps = playback_forwards_ ? steps : -1*steps;
       Update(steps);
       last_update_us_ = time;
     }
   }
   virtual void Update(int count) = 0;
  private:
+  bool playback_forwards_ = true;
   uint64_t last_update_us_ = 0;
-  uint32_t frame_timing_us_ = 10000;
+  uint32_t frame_timing_us_;
 };
 
 class PetalAnimation : public Animation {
  public:
+  PetalAnimation(I2cBus& bus, uint32_t frame_timing_us) : Animation(frame_timing_us), pm_(bus) {}
   void Init() {
     pm_.Init();
   }
@@ -53,11 +64,17 @@ private:
 };
 
 int main() {
+  constexpr size_t kDefaultFrameTiming = 10000;
+
   stdio_init_all();
-  PetalAnimation pa;
+  I2cBus i2c_bus0(i2c0, 0, 1);
+  i2c_bus0.Init();
+
+  // Application stuff.
+  PetalAnimation pa(i2c_bus0, kDefaultFrameTiming);
+  // TouchWheel tw;
   pa.Init();
   while (true) {
     pa.Advance();
-    sleep_ms(10);
   }
 }

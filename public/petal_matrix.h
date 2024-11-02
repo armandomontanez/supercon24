@@ -4,49 +4,28 @@
 #include <cstring>
 
 #include "log.h"
-#include "hardware/i2c.h"
-
-class I2cDevice {
- public:
-  I2cDevice(i2c_inst_t* i2c_bus) : i2c_bus_handle_(i2c_bus) {}
-
-  template<size_t kSize>
-  void Write(uint8_t address, uint8_t const (&command)[kSize]) {
-    i2c_write_blocking(i2c_bus_handle_, address, command, kSize, false);
-  }
-
- private:
-  i2c_inst_t* i2c_bus_handle_;
-};
+#include "i2c.h"
 
 class PetalMatrix {
  public:
-  PetalMatrix(i2c_inst_t* i2c_bus = i2c0) : i2c_bus_(i2c_bus), state_({}) {}
+  PetalMatrix(I2cBus& i2c_bus) : device_(i2c_bus, kI2cAddr), state_({}) {}
 
   void Init() {
-    constexpr size_t kSdaPin = 0;
-    constexpr size_t kSclPin = 1;
-    i2c_init(i2c0, 100 * 1000);
-    gpio_set_function(kSdaPin, GPIO_FUNC_I2C);
-    gpio_set_function(kSclPin, GPIO_FUNC_I2C);
-    gpio_pull_up(kSdaPin);
-    gpio_pull_up(kSclPin);
-
     // Restart command.
-    i2c_bus_.Write(kI2cAddr, {ShutdownRegister::Address(), ShutdownRegister::NormalOperationCmd(/*reset_to_default=*/true)});
+    device_.Write({ShutdownRegister::Address(), ShutdownRegister::NormalOperationCmd(/*reset_to_default=*/true)});
 
     // No decode.
-    i2c_bus_.Write(kI2cAddr, {DecodeEnableRegister::Address(), DecodeEnableRegister::NoDecodeCmd()});
+    device_.Write({DecodeEnableRegister::Address(), DecodeEnableRegister::NoDecodeCmd()});
 
     // Enable all characters/channels.
-    i2c_bus_.Write(kI2cAddr, {0x0b, 0x07});
+    device_.Write({0x0b, 0x07});
 
     // Intensity.
-    i2c_bus_.Write(kI2cAddr, {0x0A, 0x07});
+    device_.Write({0x0A, 0x07});
 
     // Start with all LEDs off.
     for (size_t i = 0; i < 8; i++) {
-      i2c_bus_.Write(kI2cAddr, {DigitRegister::Address(i), 0});
+      device_.Write({DigitRegister::Address(i), 0});
     }
   }
 
@@ -65,7 +44,7 @@ class PetalMatrix {
       state_[arm] &= (~DigitRegister::SegmentCmd(index));
     }
 
-    i2c_bus_.Write(kI2cAddr, {DigitRegister::Address(arm), state_[arm]});
+    device_.Write({DigitRegister::Address(arm), state_[arm]});
   }
 
  private:
@@ -101,6 +80,6 @@ class PetalMatrix {
   };
   static constexpr uint8_t kShutdownRegister = 0x0c;
   static constexpr uint8_t kI2cAddr = 0x00;
-  I2cDevice i2c_bus_;
+  I2cDevice device_;
   std::array<uint8_t, 8> state_;
 };

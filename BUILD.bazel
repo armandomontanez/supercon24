@@ -7,6 +7,19 @@ cc_library(
     includes = ["public"],
 )
 
+
+cc_library(
+    name = "i2c",
+    hdrs = [
+        "public/i2c.h",
+    ],
+    deps = [
+        "@pico-sdk//src/rp2_common/hardware_i2c",
+    ],
+    includes = ["public"],
+)
+
+
 cc_library(
     name = "petal_matrix",
     hdrs = [
@@ -14,6 +27,7 @@ cc_library(
     ],
     deps = [
         ":log",
+        ":i2c",
     ],
     includes = ["public"],
 )
@@ -26,6 +40,7 @@ cc_binary(
     deps = [
         ":petal_matrix",
         ":log",
+        ":i2c",
         "@pico-sdk//src/rp2_common/hardware_i2c",
         "@pico-sdk//src/rp2_common/pico_stdlib",
     ],
