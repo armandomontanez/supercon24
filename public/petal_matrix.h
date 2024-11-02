@@ -21,7 +21,7 @@ class I2cDevice {
 
 class PetalMatrix {
  public:
-  PetalMatrix() : i2c_bus_(i2c0), state_({}) {}
+  PetalMatrix(i2c_inst_t* i2c_bus = i2c0) : i2c_bus_(i2c_bus), state_({}) {}
 
   void Init() {
     constexpr size_t kSdaPin = 0;
