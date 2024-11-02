@@ -25,6 +25,8 @@ class Animation {
       last_update_us_ = time;
     }
   }
+
+  void SetFrameTime(uint32_t frame_time) { frame_timing_us_ = frame_time; }
   virtual void Update(int count) = 0;
  private:
   bool playback_forwards_ = true;
@@ -64,6 +66,15 @@ private:
   int next_j_ = 0;
 };
 
+uint32_t PositionToFrameTime(uint8_t position) {
+  constexpr size_t kMinFrameTime = 5000;
+  constexpr size_t kMaxFrameTime = 100000;
+  if (position > 128) {
+    position = 255 - position;
+  }
+  return ((kMaxFrameTime - kMinFrameTime) * position)/128 + kMinFrameTime;
+}
+
 int main() {
   constexpr size_t kDefaultFrameTiming = 10000;
 
@@ -79,9 +90,19 @@ int main() {
   pa.Init();
   while (true) {
     pa.Advance();
+
     uint8_t wheel_pos = tw.GetRaw();
-    if (wheel_pos != 0) {
+    if (wheel_pos != 0 && wheel_pos != 255) {
+      if (wheel_pos < 128) {
+        pa.PlayForwards(false);
+      } else {
+        pa.PlayForwards(true);
+      }
+      pa.SetFrameTime(PositionToFrameTime(wheel_pos));
       LOG(DEBUG, "Touch wheel pos %d", int(wheel_pos));
+    } else if (wheel_pos == 0) {
+      pa.PlayForwards(true);
+      pa.SetFrameTime(kDefaultFrameTiming);
     }
   }
 }
