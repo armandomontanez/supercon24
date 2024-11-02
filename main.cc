@@ -6,10 +6,22 @@
 
 class Animation {
  public:
+  void Advance() {
+    uint64_t time = time_us_64();
+
+    int steps = (time - last_update_us_)/frame_timing_us_;
+    if (steps) {
+      Update(steps);
+      last_update_us_ = time;
+    }
+  }
   virtual void Update(int count) = 0;
+ private:
+  uint64_t last_update_us_ = 0;
+  uint32_t frame_timing_us_ = 10000;
 };
 
-class PetalAnimation : Animation {
+class PetalAnimation : public Animation {
  public:
   void Init() {
     pm_.Init();
@@ -45,7 +57,7 @@ int main() {
   PetalAnimation pa;
   pa.Init();
   while (true) {
-    pa.Update(1);
+    pa.Advance();
     sleep_ms(10);
   }
 }
