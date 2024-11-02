@@ -31,6 +31,12 @@ class I2cDevice {
     i2c_write_blocking(i2c_bus_.native_handle(), device_address_, command, kSize, false);
   }
 
+  uint8_t ReadByte() {
+    uint8_t dest;
+    i2c_read_blocking(i2c_bus_.native_handle(), device_address_, &dest, 1, false);
+    return dest;
+  }
+
  private:
   I2cBus& i2c_bus_;
   uint8_t device_address_;

@@ -4,6 +4,7 @@
 #include "log.h"
 #include "i2c.h"
 #include "petal_matrix.h"
+#include "touch_wheel.h"
 #include "hardware/i2c.h"
 
 class Animation {
@@ -68,13 +69,19 @@ int main() {
 
   stdio_init_all();
   I2cBus i2c_bus0(i2c0, 0, 1);
+  I2cBus i2c_bus1(i2c0, 26, 27);
   i2c_bus0.Init();
+  i2c_bus1.Init();
 
   // Application stuff.
   PetalAnimation pa(i2c_bus0, kDefaultFrameTiming);
-  // TouchWheel tw;
+  TouchWheel tw(i2c_bus1);
   pa.Init();
   while (true) {
     pa.Advance();
+    uint8_t wheel_pos = tw.GetRaw();
+    if (wheel_pos != 0) {
+      LOG(DEBUG, "Touch wheel pos %d", int(wheel_pos));
+    }
   }
 }

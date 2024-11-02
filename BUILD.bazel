@@ -19,7 +19,6 @@ cc_library(
     includes = ["public"],
 )
 
-
 cc_library(
     name = "petal_matrix",
     hdrs = [
@@ -32,6 +31,16 @@ cc_library(
     includes = ["public"],
 )
 
+cc_library(
+    name = "touch_wheel",
+    hdrs = [
+        "public/touch_wheel.h",
+    ],
+    deps = [
+        ":i2c",
+    ],
+    includes = ["public"],
+)
 
 cc_binary(
     name = "main",
@@ -41,6 +50,7 @@ cc_binary(
         ":petal_matrix",
         ":log",
         ":i2c",
+        ":touch_wheel",
         "@pico-sdk//src/rp2_common/hardware_i2c",
         "@pico-sdk//src/rp2_common/pico_stdlib",
     ],
