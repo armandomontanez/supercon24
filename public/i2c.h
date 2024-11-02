@@ -32,7 +32,7 @@ class I2cDevice {
   }
 
   uint8_t ReadByte() {
-    uint8_t dest;
+    uint8_t dest = 0;
     i2c_read_blocking(i2c_bus_.native_handle(), device_address_, &dest, 1, false);
     return dest;
   }
