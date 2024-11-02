@@ -11,7 +11,7 @@ class I2cDevice {
   I2cDevice(i2c_inst_t* i2c_bus) : i2c_bus_handle_(i2c_bus) {}
 
   template<size_t kSize>
-  Write(uint8_t address, uint8_t const (&command)[kSize]) {
+  void Write(uint8_t address, uint8_t const (&command)[kSize]) {
     i2c_write_blocking(i2c_bus_handle_, address, command, kSize, false);
   }
 
