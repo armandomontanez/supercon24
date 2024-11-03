@@ -15,6 +15,13 @@ class PetalAnimation1 : public Animation {
     pm_.Init();
   }
 
+  void Reset() override {
+    pm_.Reset();
+    set_or_clear_ = true;
+    next_i_ = 0;
+    next_j_ = 0;
+  }
+
   void Update(int count) override {
     int step = count < 0 ? -1 : 1;
     for (size_t i = 0; i < abs(count); i++) {
@@ -48,6 +55,13 @@ class PetalAnimation2 : public Animation {
   PetalAnimation2(I2cBus& bus) : pm_(bus) {}
   void Init() {
     pm_.Init();
+  }
+
+  void Reset() override {
+    pm_.Reset();
+    set_or_clear_ = true;
+    next_i_ = 0;
+    next_j_ = 0;
   }
 
   void Update(int count) override {

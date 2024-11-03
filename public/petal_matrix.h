@@ -23,7 +23,11 @@ class PetalMatrix {
     // Intensity.
     device_.Write({0x0A, 0x07});
 
-    // Start with all LEDs off.
+    Reset();
+  }
+
+  void Reset() {
+    // Turn off all LEDs.
     for (size_t i = 0; i < 8; i++) {
       device_.Write({DigitRegister::Address(i), 0});
     }

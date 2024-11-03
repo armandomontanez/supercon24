@@ -6,6 +6,7 @@
 
 class Animation {
  public:
+  virtual void Reset() = 0;
   virtual void Update(int step_count) = 0;
   virtual void HandlePlaybackDirectionChanged(bool play_forwards) {}
 };
@@ -36,6 +37,9 @@ class Animator {
 
   void SetAnimation(Animation* animation) {
     animation_ = animation;
+    if (animation_ != nullptr) {
+      animation_->Reset();
+    }
   }
 
   void SetFrameTime(uint32_t frame_time) { frame_timing_us_ = frame_time; }
