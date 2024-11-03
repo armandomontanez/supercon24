@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "pico/stdlib.h"
+
 class Animation {
  public:
   Animation(uint32_t frame_timing_us) : frame_timing_us_(frame_timing_us) {}
